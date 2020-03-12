@@ -104,6 +104,23 @@ void stepperMove() {
 	prepareMove(duration, penStepsEBB, rotStepsEBB);
 }
 
+void moveTo(int position, int speed) {
+  mapSpeed = map(speed, 5, 8000, 30, 0);
+  if (position>penState) {
+    for (pos=penState; pos <= position; pos += 1) {
+      penServo.write(pos);
+      penState=pos;
+      delay(mapSpeed);
+    }
+  } else {
+    for (pos=penState; pos >= position; pos -= 1) {
+      penServo.write(pos);
+      penState=pos;
+      delay(mapSpeed);
+    }
+  }
+}
+
 void setPen(){
 	int cmd;
 	int value;
@@ -116,13 +133,11 @@ void setPen(){
 		cmd = atoi(arg);
 		switch (cmd) {
 			case 0:
-				penServo.write(penUpPos);
-				penState=penUpPos;
+				moveTo(penUpPos, servoRateUp);
 				break;
 
 			case 1:
-				penServo.write(penDownPos);
-				penState=penDownPos;
+				moveTo(penDownPos, servoRateDown);
 				break;
 
 			default:
@@ -164,11 +179,9 @@ void togglePen(){
 
 void doTogglePen() {
 	if (penState==penUpPos) {
-		penServo.write(penDownPos);
-		penState=penDownPos;
+		moveTo(penDownPos, servoRateDown);
 	} else   {
-		penServo.write(penUpPos);
-		penState=penUpPos;
+		moveTo(penUpPos, servoRateUp);
 	}
 }
 
